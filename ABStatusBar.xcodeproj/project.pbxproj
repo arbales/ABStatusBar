@@ -10,9 +10,22 @@
 		D91D1CED2EC58190008B9878 /* ABStatusBar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ABStatusBar.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		D984DABE2EC59064003D279D /* Exceptions for "ABStatusBar" folder in "ABStatusBar" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = D91D1CEC2EC58190008B9878 /* ABStatusBar */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		D91D1CEF2EC58190008B9878 /* ABStatusBar */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				D984DABE2EC59064003D279D /* Exceptions for "ABStatusBar" folder in "ABStatusBar" target */,
+			);
 			path = ABStatusBar;
 			sourceTree = "<group>";
 		};

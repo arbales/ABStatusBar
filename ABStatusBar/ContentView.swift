@@ -8,6 +8,17 @@
 internal import Combine
 import SwiftUI
 
+extension View {
+  @ViewBuilder
+  func debugBackground(_ color: Color) -> some View {
+    if AppSettings.shared.debugMode {
+      self.background(color.opacity(0.3))
+    } else {
+      self
+    }
+  }
+}
+
 struct StatusBarView: View {
   var body: some View {
     HStack(alignment: .center, spacing: 0) {
@@ -31,6 +42,7 @@ struct WeekNumberView: View {
       .foregroundColor(.primary)
       .padding(.horizontal, 12)
       .padding(.vertical, 6)
+      .debugBackground(.blue)
       .onReceive(timer) { input in
         currentDate = input
       }
@@ -54,6 +66,7 @@ struct ClockView: View {
       .foregroundColor(.primary)
       .padding(.horizontal, 12)
       .padding(.vertical, 6)
+      .debugBackground(.red)
       .onReceive(timer) { input in
         currentTime = input
       }

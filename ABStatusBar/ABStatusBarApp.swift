@@ -45,7 +45,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
       let screenFrame = screen.frame
       let windowFrame = window.frame
       let x = screenFrame.maxX - windowFrame.width
-      let y = screenFrame.maxY - windowFrame.height
+      let y = screenFrame.maxY - windowFrame.height + 1
       window.setFrameOrigin(NSPoint(x: x, y: y))
     }
 

@@ -30,10 +30,10 @@ class WiFiMonitor: NSObject, ObservableObject, CLLocationManagerDelegate {
     locationManager?.delegate = self
 
     let status = locationManager?.authorizationStatus ?? .notDetermined
-    print("WiFi: Location authorization status: \(status.rawValue)")
+    AppSettings.shared.debugPrint("WiFi: Location authorization status: \(status.rawValue)")
 
     if status == .notDetermined {
-      print("WiFi: Requesting location authorization")
+      AppSettings.shared.debugPrint("WiFi: Requesting location authorization")
       locationManager?.requestWhenInUseAuthorization()
     }
 
@@ -42,7 +42,8 @@ class WiFiMonitor: NSObject, ObservableObject, CLLocationManagerDelegate {
   }
 
   func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-    print("WiFi: Location authorization changed to: \(manager.authorizationStatus.rawValue)")
+    AppSettings.shared.debugPrint(
+      "WiFi: Location authorization changed to: \(manager.authorizationStatus.rawValue)")
     updateWiFiStatus()
   }
 
@@ -56,27 +57,28 @@ class WiFiMonitor: NSObject, ObservableObject, CLLocationManagerDelegate {
   private func updateWiFiStatus() {
     // Try to get default interface name
     let interfaceNames = CWWiFiClient.interfaceNames()
-    print("WiFi: Available interfaces: \(String(describing: interfaceNames))")
+    AppSettings.shared.debugPrint(
+      "WiFi: Available interfaces: \(String(describing: interfaceNames))")
 
     guard let interfaceNames = interfaceNames,
       let firstInterfaceName = interfaceNames.first,
       let interface = CWWiFiClient.shared().interface(withName: firstInterfaceName)
     else {
-      print("WiFi: No interface available")
+      AppSettings.shared.debugPrint("WiFi: No interface available")
       isConnected = false
       return
     }
 
-    print("WiFi: Interface name: \(interface.interfaceName ?? "unknown")")
+    AppSettings.shared.debugPrint("WiFi: Interface name: \(interface.interfaceName ?? "unknown")")
 
     isPowerOn = interface.powerOn()
-    print("WiFi: Power on: \(isPowerOn)")
-    print("WiFi: Service active: \(interface.serviceActive())")
+    AppSettings.shared.debugPrint("WiFi: Power on: \(isPowerOn)")
+    AppSettings.shared.debugPrint("WiFi: Service active: \(interface.serviceActive())")
 
     currentInterface = interface
 
     let ssidData = interface.ssid()
-    print("WiFi: SSID: \(String(describing: ssidData))")
+    AppSettings.shared.debugPrint("WiFi: SSID: \(String(describing: ssidData))")
 
     if let ssidData = ssidData {
       isConnected = true
@@ -85,7 +87,7 @@ class WiFiMonitor: NSObject, ObservableObject, CLLocationManagerDelegate {
       // Convert RSSI to signal bars (0-3)
       // RSSI typically ranges from -90 (weak) to -30 (strong)
       let rssi = interface.rssiValue()
-      print("WiFi: Connected to \(ssidData), RSSI: \(rssi)")
+      AppSettings.shared.debugPrint("WiFi: Connected to \(ssidData), RSSI: \(rssi)")
       if rssi >= -50 {
         signalStrength = 3
       } else if rssi >= -60 {
@@ -96,7 +98,7 @@ class WiFiMonitor: NSObject, ObservableObject, CLLocationManagerDelegate {
         signalStrength = 0
       }
     } else {
-      print("WiFi: Not connected or no permission to read SSID")
+      AppSettings.shared.debugPrint("WiFi: Not connected or no permission to read SSID")
       isConnected = false
       signalStrength = 0
       ssid = ""
@@ -132,7 +134,7 @@ class WiFiMonitor: NSObject, ObservableObject, CLLocationManagerDelegate {
       print(
         "WiFi: Found \(networks.count) total networks, \(availableNetworks.count) unique networks")
     } catch {
-      print("WiFi: Error scanning networks: \(error)")
+      AppSettings.shared.debugPrint("WiFi: Error scanning networks: \(error)")
     }
   }
 
@@ -157,14 +159,14 @@ class WiFiMonitor: NSObject, ObservableObject, CLLocationManagerDelegate {
       let newState = !isPowerOn
       try interface.setPower(newState)
       isPowerOn = newState
-      print("WiFi: Power toggled to \(newState)")
+      AppSettings.shared.debugPrint("WiFi: Power toggled to \(newState)")
 
       // Update status after toggling
       DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
         self.updateWiFiStatus()
       }
     } catch {
-      print("WiFi: Error toggling power: \(error)")
+      AppSettings.shared.debugPrint("WiFi: Error toggling power: \(error)")
     }
   }
 
@@ -223,7 +225,7 @@ struct WiFiMenuView: View {
             if let ssid = network.ssid {
               Button(action: {
                 // TODO: Handle network selection
-                print("Selected network: \(ssid)")
+                AppSettings.shared.debugPrint("Selected network: \(ssid)")
               }) {
                 HStack {
                   Image(systemName: signalIcon(for: network.rssiValue))
@@ -268,6 +270,21 @@ struct WiFiMenuView: View {
       .font(.system(size: 13))
       .padding(.horizontal, 12)
       .padding(.vertical, 8)
+
+      Divider()
+
+      // Debug toggle
+      Toggle(
+        "Debug Mode",
+        isOn: Binding(
+          get: { AppSettings.shared.debugMode },
+          set: { AppSettings.shared.debugMode = $0 }
+        )
+      )
+      .toggleStyle(.checkbox)
+      .font(.system(size: 13))
+      .padding(.horizontal, 12)
+      .padding(.vertical, 8)
     }
     .frame(width: 300)
     .background(Color(NSColor.controlBackgroundColor))
@@ -306,6 +323,7 @@ struct WiFiView: View {
     .buttonStyle(.plain)
     .padding(.horizontal, 12)
     .padding(.vertical, 6)
+    .debugBackground(.green)
     .popover(isPresented: $showMenu, arrowEdge: .bottom) {
       WiFiMenuView(monitor: monitor, isPresented: $showMenu)
     }
