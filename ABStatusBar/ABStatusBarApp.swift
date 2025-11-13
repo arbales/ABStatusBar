@@ -18,6 +18,20 @@ struct ABStatusBarApp: App {
   }
 }
 
+class StatusBarWindow: NSWindow {
+  override var canBecomeKey: Bool {
+    return true
+  }
+
+  override var canBecomeMain: Bool {
+    return false
+  }
+
+  override func mouseDown(with event: NSEvent) {
+    super.mouseDown(with: event)
+  }
+}
+
 class AppDelegate: NSObject, NSApplicationDelegate {
   var statusBarWindow: NSWindow?
 
@@ -26,7 +40,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     NSApp.setActivationPolicy(.accessory)
 
     // Create a borderless window
-    let window = NSWindow(
+    let window = StatusBarWindow(
       contentRect: NSRect(x: 0, y: 0, width: 800, height: 32),
       styleMask: [.borderless, .fullSizeContentView],
       backing: .buffered,
@@ -39,6 +53,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     window.level = .statusBar
     window.collectionBehavior = [.canJoinAllSpaces, .stationary, .ignoresCycle]
     window.isMovable = false
+    window.acceptsMouseMovedEvents = true
+    window.ignoresMouseEvents = false
 
     // Position window at top-right
     if let screen = NSScreen.main {
