@@ -12,6 +12,7 @@ class AppSettings: ObservableObject {
   static let shared = AppSettings()
 
   @AppStorage("debugMode") var debugMode: Bool = false
+  @Published var textColor: Color = .white
 
   private init() {}
 

@@ -33,13 +33,14 @@ struct StatusBarView: View {
 
 struct WeekNumberView: View {
   @State private var currentDate = Date()
+  @ObservedObject private var settings = AppSettings.shared
 
   let timer = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
 
   var body: some View {
     Text(weekString)
       .font(.system(size: 14, weight: .medium, design: .default))
-      .foregroundColor(.primary)
+      .foregroundColor(settings.textColor)
       .padding(.horizontal, 12)
       .padding(.vertical, 6)
       .debugBackground(.blue)
@@ -57,19 +58,25 @@ struct WeekNumberView: View {
 
 struct ClockView: View {
   @State private var currentTime = Date()
+  @ObservedObject private var settings = AppSettings.shared
 
   let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
   var body: some View {
-    Text(timeString)
-      .font(.system(size: 14, weight: .medium, design: .default))
-      .foregroundColor(.primary)
-      .padding(.horizontal, 12)
-      .padding(.vertical, 6)
-      .debugBackground(.red)
-      .onReceive(timer) { input in
-        currentTime = input
-      }
+    Button(action: {
+      settings.textColor = settings.textColor == .white ? .black : .white
+    }) {
+      Text(timeString)
+        .font(.system(size: 14, weight: .medium, design: .default))
+        .foregroundColor(settings.textColor)
+    }
+    .buttonStyle(.plain)
+    .padding(.horizontal, 12)
+    .padding(.vertical, 6)
+    .debugBackground(.red)
+    .onReceive(timer) { input in
+      currentTime = input
+    }
   }
 
   private var timeString: String {

@@ -311,6 +311,7 @@ struct WiFiMenuView: View {
 struct WiFiView: View {
   @StateObject private var monitor = WiFiMonitor()
   @State private var showMenu = false
+  @ObservedObject private var settings = AppSettings.shared
 
   var body: some View {
     Button(action: {
@@ -318,7 +319,7 @@ struct WiFiView: View {
     }) {
       Image(systemName: wifiIconName)
         .font(.system(size: 14, weight: .medium))
-        .foregroundColor(.primary)
+        .foregroundColor(settings.textColor)
     }
     .buttonStyle(.plain)
     .padding(.horizontal, 12)
